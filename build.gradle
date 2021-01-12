@@ -1,0 +1,34 @@
+plugins {
+    id 'java'
+}
+
+group 'org.wolox'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation group: 'com.github.appium', name: 'java-client', version: '7.4.1'
+    testImplementation group: 'io.cucumber', name: 'cucumber-java', version: '6.8.1'
+    testImplementation group: 'io.cucumber', name: 'cucumber-junit', version: '6.8.1'
+    testImplementation group: 'junit', name: 'junit', version: '5.7.0'
+}
+
+configurations {
+    cucumberRuntime {
+        extendsFrom testImplementation
+    }
+}
+
+task cucumber() {
+    dependsOn assemble, testClasses
+    doLast {
+        javaexec {
+            main = "io.cucumber.core.cli.Main"
+            classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
+            args = ['--plugin', 'pretty', '--glue', 'gradle.cucumber', 'src/test/resources']
+        }
+    }
+}
